@@ -761,12 +761,17 @@
           </div>
         </div>
 
-        <form id="scenario-form">
+        <form id="scenario-form" action="https://formspree.io/f/xbdeebke" method="POST" novalidate>
+          <!-- Formspree config -->
+          <input type="hidden" name="_subject" value="Mortgage strategy review request — Sunny Home Loans" />
+          <input type="hidden" name="_replyto" id="replyto-field" />
+          <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off" />
+
           <div class="form-row">
             <div class="field"><label for="name">Full name</label><input id="name" type="text" name="name" autocomplete="name" required /></div>
             <div class="field"><label for="phone">Phone number</label><input id="phone" type="tel" name="phone" autocomplete="tel" required /></div>
           </div>
-          <div class="field"><label for="email">Email address</label><input id="email" type="email" name="email" autocomplete="email" required /></div>
+          <div class="field"><label for="email">Email address</label><input id="email" type="email" name="email" autocomplete="email" required oninput="document.getElementById('replyto-field').value=this.value" /></div>
           <div class="form-row">
             <div class="field">
               <label for="loan_goal">Financing objective</label>
@@ -787,12 +792,19 @@
             <label for="message">Scenario notes</label>
             <textarea id="message" name="message" placeholder="Property type, purchase/refinance goal, income type, assets/equity, rental income or business use, timeline, and any issues a bank already raised."></textarea>
           </div>
-          <button type="submit">Send scenario &rarr;</button>
+          <button type="submit" id="form-submit-btn">Send scenario &rarr;</button>
           <div class="form-status" role="status" aria-live="polite"></div>
           <div class="fine-print">
-            This form opens your email app with the scenario details pre-filled so you can review before sending. This is not a commitment to lend. All loans are subject to borrower qualification, underwriting approval, program guidelines, and property eligibility.
+            Your information is sent directly and securely to Harout. This is not a commitment to lend. All loans are subject to borrower qualification, underwriting approval, program guidelines, and property eligibility.
           </div>
         </form>
+
+        <!-- Success message (hidden until submission) -->
+        <div id="form-success" style="display:none; padding: 32px 0; text-align:left;">
+          <div style="font-size:28px; margin-bottom:12px;">&#10003;</div>
+          <strong style="font-size:18px; color:var(--black);">Scenario received — thank you.</strong>
+          <p style="margin-top:10px; color:var(--muted); font-size:15px; line-height:1.6;">Harout will review your scenario and respond within 1 business day, often same day.<br/>You can also reach him directly at <a href="mailto:hterpapyan@sunnyhl.com" style="color:var(--gold);">hterpapyan@sunnyhl.com</a>.</p>
+        </div>
       </div>
     </section>
   </main>
@@ -813,24 +825,42 @@
   <script>
     const form = document.querySelector('#scenario-form');
     const status = document.querySelector('.form-status');
+    const submitBtn = document.querySelector('#form-submit-btn');
 
-    form.addEventListener('submit', (event) => {
+    form.addEventListener('submit', async (event) => {
       event.preventDefault();
-      const data = new FormData(form);
-      const lines = [
-        `Name: ${data.get('name') || ''}`,
-        `Phone: ${data.get('phone') || ''}`,
-        `Email: ${data.get('email') || ''}`,
-        `Financing objective: ${data.get('loan_goal') || ''}`,
-        `Borrower profile: ${data.get('profile') || ''}`,
-        '',
-        'Scenario notes:',
-        data.get('message') || ''
-      ];
-      const subject = encodeURIComponent('Mortgage strategy review request');
-      const body = encodeURIComponent(lines.join('\n'));
-      status.textContent = 'Opening your email app with the scenario details.';
-      window.location.href = `mailto:hterpapyan@sunnyhl.com?subject=${subject}&body=${body}`;
+
+      // Basic validation
+      const required = form.querySelectorAll('[required]');
+      let valid = true;
+      required.forEach(el => { if (!el.value.trim()) { el.style.borderColor = '#c0392b'; valid = false; } else { el.style.borderColor = ''; } });
+      if (!valid) { status.textContent = 'Please fill in all required fields.'; status.style.color = '#c0392b'; return; }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending…';
+      status.textContent = '';
+      status.style.color = '';
+
+      try {
+        const res = await fetch('https://formspree.io/f/xbdeebke', {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (res.ok) {
+          form.style.display = 'none';
+          document.getElementById('form-success').style.display = 'block';
+        } else {
+          const json = await res.json().catch(() => ({}));
+          throw new Error(json.error || 'Server error');
+        }
+      } catch (err) {
+        status.textContent = 'Something went wrong. Please email hterpapyan@sunnyhl.com directly.';
+        status.style.color = '#c0392b';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send scenario →';
+      }
     });
   </script>
 </body>
