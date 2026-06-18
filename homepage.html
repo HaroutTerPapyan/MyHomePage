@@ -537,6 +537,27 @@
       section, .perspective { padding: 68px 0; }
       .contact-shell { padding-bottom: 68px; }
     }
+
+    /* ── MOBILE LOAN STRIP ── */
+    .mobile-loan-strip {
+      display: none;
+      background: var(--black);
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+    .mobile-loan-strip a {
+      display: inline-block;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 0.02em;
+      border-right: 1px solid rgba(255,255,255,.08);
+    }
+    .mobile-loan-strip a:last-child { border-right: none; }
+    .mobile-loan-strip a:hover { background: rgba(255,255,255,.05); }
+    @media (max-width: 1040px) {
+      .mobile-loan-strip { display: flex; flex-wrap: wrap; }
+    }
   </style>
 </head>
 <body>
@@ -568,6 +589,12 @@
         </div>
         <a class="nav-cta" href="#contact">Request review &rarr;</a>
       </nav>
+    </div>
+    <!-- Mobile loan links strip -->
+    <div class="mobile-loan-strip">
+      <a href="dscr-loan-los-angeles.html">DSCR Loans</a>
+      <a href="bank-statement-mortgage-los-angeles.html">Bank Statement</a>
+      <a href="adu-loan-santa-clarita.html">ADU Loans</a>
     </div>
   </header>
 
