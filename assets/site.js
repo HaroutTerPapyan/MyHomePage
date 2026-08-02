@@ -23,9 +23,9 @@ async function loadPartial(elementId, path) {
 
 async function initSite() {
   await Promise.all([
-    loadPartial('site-header', '/header.html'),
-    document.getElementById('site-modal') ? loadPartial('site-modal', '/modal.html') : Promise.resolve(),
-    loadPartial('site-footer', '/footer.html')
+    loadPartial('site-header', '/partials/header.html'),
+    document.getElementById('site-modal') ? loadPartial('site-modal', '/partials/modal.html') : Promise.resolve(),
+    loadPartial('site-footer', '/partials/footer.html')
   ]);
 
   setupNav();

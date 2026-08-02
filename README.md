@@ -19,11 +19,17 @@ and every page picks up the change.
 ├── dscr-loan-los-angeles.html
 ├── bank-statement-mortgage-los-angeles.html
 ├── adu-loan-santa-clarita.html
+├── index.html               ← redirects the bare domain to /homepage.html
 └── blog/
     ├── index.html                       ← resources/blog landing page
     ├── dscr-loan-requirements-2026.html ← your first live post
     └── _new-post-template.html          ← copy this to start a new post
 ```
+
+**Note on `index.html`:** GitHub Pages automatically serves this file for the bare
+domain (`haroutterpapyan.com/`). The root one is a one-line redirect to
+`/homepage.html` so visitors land on your real homepage. The one inside `blog/`
+is a different file — the actual blog listing page, shown at `/blog/`.
 
 ## What changed from your original files
 
