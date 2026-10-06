@@ -9,6 +9,24 @@
 <script>
   window.LEAD_FORM = { action: "https://formspree.io/f/xeewndrb", loanType: "DSCR Investor Loan" };
 </script>
+<style>
+  .calc-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 44px; }
+  .calc-inputs, .calc-results { background: var(--white); padding: 32px; }
+  .calc-inputs .field { margin-bottom: 16px; }
+  .calc-results { background: var(--black); color: var(--white); }
+  .calc-result-row { display: flex; justify-content: space-between; align-items: baseline; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,.14); }
+  .calc-result-row:last-of-type { border-bottom: none; }
+  .calc-result-label { color: rgba(255,255,255,.62); font-size: 13px; }
+  .calc-result-value { font-size: 20px; font-weight: 800; letter-spacing: -.01em; }
+  .calc-dscr-headline { text-align: center; padding: 22px 0 26px; border-bottom: 1px solid rgba(255,255,255,.14); margin-bottom: 6px; }
+  .calc-dscr-headline .calc-dscr-num { font-size: 48px; font-weight: 800; letter-spacing: -.03em; line-height: 1; }
+  .calc-dscr-headline .calc-dscr-sub { color: rgba(255,255,255,.62); font-size: 13px; margin-top: 6px; }
+  .calc-verdict { margin-top: 18px; padding: 14px 16px; border-radius: var(--radius); font-size: 14px; font-weight: 700; text-align: center; }
+  .calc-verdict.good { background: rgba(31,107,85,.22); color: #6fd6b4; }
+  .calc-verdict.caution { background: rgba(184,135,43,.22); color: var(--gold); }
+  .calc-verdict.bad { background: rgba(192,57,43,.22); color: #ff8b7c; }
+  @media (max-width: 1040px) { .calc-wrap { grid-template-columns: 1fr; } }
+</style>
 </head>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-PHRVTK7MH8"></script>
@@ -32,7 +50,7 @@
         <p class="hero-sub">DSCR loans let the property's cash flow do the talking. No W2. No tax returns. Close in your LLC in as little as 3 weeks.</p>
         <div class="hero-ctas">
           <button class="button button-primary" onclick="openModal('DSCR Investor Loan')">Get My Free DSCR Quote</button>
-          <a href="#dscr-params" class="button button-secondary" style="background:none;border:1px solid rgba(255,255,255,.34);color:var(--white);">See Loan Parameters</a>
+          <a href="#dscr-calculator" class="button button-secondary" style="background:none;border:1px solid rgba(255,255,255,.34);color:var(--white);">Calculate My DSCR</a>
         </div>
       </div>
     </div>
@@ -46,6 +64,72 @@
       <div class="stat"><span class="stat-num">LLC &#10003;</span><span class="stat-label">Entity Vesting OK</span></div>
     </div>
   </div>
+
+  <section id="dscr-calculator" class="section-block section-alt">
+    <div class="container">
+      <div class="kicker">Free Tool</div>
+      <div class="gold-rule"></div>
+      <h2 class="section-title">DSCR Calculator</h2>
+      <p class="section-body">Run your own numbers in seconds. Enter a property's price, expected rent, and loan terms to see the estimated DSCR ratio and monthly payment — no application required.</p>
+
+      <div class="calc-wrap">
+        <div class="calc-inputs">
+          <div class="field">
+            <label for="calc-price">Purchase Price / Value</label>
+            <input type="number" id="calc-price" value="650000" min="0" step="1000" oninput="calcDSCR()" />
+          </div>
+          <div class="field">
+            <label for="calc-down">Down Payment (%)</label>
+            <input type="number" id="calc-down" value="25" min="0" max="100" step="1" oninput="calcDSCR()" />
+          </div>
+          <div class="field">
+            <label for="calc-rate">Interest Rate (%)</label>
+            <input type="number" id="calc-rate" value="7.25" min="0" max="20" step="0.01" oninput="calcDSCR()" />
+          </div>
+          <div class="field">
+            <label for="calc-term">Loan Term</label>
+            <select id="calc-term" oninput="calcDSCR()">
+              <option value="30">30-Year Fixed</option>
+              <option value="40">40-Year (I/O-eligible)</option>
+              <option value="15">15-Year Fixed</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="calc-rent">Expected Monthly Rent</label>
+            <input type="number" id="calc-rent" value="4200" min="0" step="50" oninput="calcDSCR()" />
+          </div>
+          <div class="field">
+            <label for="calc-tax">Annual Property Tax Rate (%)</label>
+            <input type="number" id="calc-tax" value="1.25" min="0" max="5" step="0.01" oninput="calcDSCR()" />
+          </div>
+          <div class="field">
+            <label for="calc-insurance">Annual Insurance ($)</label>
+            <input type="number" id="calc-insurance" value="1800" min="0" step="50" oninput="calcDSCR()" />
+          </div>
+          <div class="field">
+            <label for="calc-hoa">Monthly HOA ($, if any)</label>
+            <input type="number" id="calc-hoa" value="0" min="0" step="10" oninput="calcDSCR()" />
+          </div>
+        </div>
+
+        <div class="calc-results">
+          <div class="calc-dscr-headline">
+            <div class="calc-dscr-num" id="calc-dscr-num">—</div>
+            <div class="calc-dscr-sub">Estimated DSCR Ratio</div>
+          </div>
+          <div class="calc-result-row"><span class="calc-result-label">Loan Amount</span><span class="calc-result-value" id="calc-loan-amount">—</span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Principal &amp; Interest</span><span class="calc-result-value" id="calc-pi">—</span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Monthly Taxes</span><span class="calc-result-value" id="calc-taxes">—</span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Monthly Insurance</span><span class="calc-result-value" id="calc-ins">—</span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Monthly HOA</span><span class="calc-result-value" id="calc-hoa-out">—</span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Total PITIA Payment</span><span class="calc-result-value" id="calc-pitia">—</span></div>
+          <div class="calc-verdict good" id="calc-verdict">Enter your numbers above</div>
+          <button class="button button-primary" style="width:100%; margin-top:20px;" onclick="openModal('DSCR Investor Loan')">Get an Official Quote on This Deal</button>
+        </div>
+      </div>
+      <p class="fine-print" style="margin-top:18px;">This calculator provides estimates for illustration only and is not a loan offer or pre-approval. Actual rates, payments, and qualification depend on full underwriting, lender guidelines, and property-specific factors.</p>
+    </div>
+  </section>
 
   <section class="section-block">
     <div class="container">
@@ -157,5 +241,60 @@
 <div id="site-modal"></div>
 <div id="site-footer"></div>
 <script src="/assets/site.js"></script>
+<script>
+  function calcDSCR() {
+    var price = parseFloat(document.getElementById('calc-price').value) || 0;
+    var downPct = parseFloat(document.getElementById('calc-down').value) || 0;
+    var rate = parseFloat(document.getElementById('calc-rate').value) || 0;
+    var termYears = parseFloat(document.getElementById('calc-term').value) || 30;
+    var rent = parseFloat(document.getElementById('calc-rent').value) || 0;
+    var taxRatePct = parseFloat(document.getElementById('calc-tax').value) || 0;
+    var annualInsurance = parseFloat(document.getElementById('calc-insurance').value) || 0;
+    var hoa = parseFloat(document.getElementById('calc-hoa').value) || 0;
+
+    var loanAmount = price * (1 - downPct / 100);
+    var monthlyRate = (rate / 100) / 12;
+    var n = termYears * 12;
+
+    var pi;
+    if (monthlyRate === 0) {
+      pi = n > 0 ? loanAmount / n : 0;
+    } else {
+      pi = loanAmount * monthlyRate / (1 - Math.pow(1 + monthlyRate, -n));
+    }
+    if (!isFinite(pi)) pi = 0;
+
+    var monthlyTax = (price * (taxRatePct / 100)) / 12;
+    var monthlyInsurance = annualInsurance / 12;
+    var pitia = pi + monthlyTax + monthlyInsurance + hoa;
+    var dscr = pitia > 0 ? (rent / pitia) : 0;
+
+    var fmt = function (n) {
+      return '$' + n.toLocaleString('en-US', { maximumFractionDigits: 0 });
+    };
+
+    document.getElementById('calc-loan-amount').textContent = fmt(loanAmount);
+    document.getElementById('calc-pi').textContent = fmt(pi);
+    document.getElementById('calc-taxes').textContent = fmt(monthlyTax);
+    document.getElementById('calc-ins').textContent = fmt(monthlyInsurance);
+    document.getElementById('calc-hoa-out').textContent = fmt(hoa);
+    document.getElementById('calc-pitia').textContent = fmt(pitia);
+    document.getElementById('calc-dscr-num').textContent = dscr > 0 ? dscr.toFixed(2) : '—';
+
+    var verdictEl = document.getElementById('calc-verdict');
+    if (dscr >= 1.0) {
+      verdictEl.className = 'calc-verdict good';
+      verdictEl.textContent = 'Strong — this property likely qualifies at standard terms.';
+    } else if (dscr >= 0.75) {
+      verdictEl.className = 'calc-verdict caution';
+      verdictEl.textContent = 'Below 1.0 — may still qualify with a higher rate or lower LTV.';
+    } else {
+      verdictEl.className = 'calc-verdict bad';
+      verdictEl.textContent = 'Below 0.75 — unlikely to qualify under standard DSCR programs.';
+    }
+  }
+
+  calcDSCR();
+</script>
 </body>
 </html>
